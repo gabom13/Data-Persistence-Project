@@ -11,14 +11,14 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreAndNameText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
-    
+   
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +36,10 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        if (MenuManager.Instance != null)
+        {
+            BestScoreAndNameText.text = "Best Score : " + MenuManager.Instance.bestPlayerName + " : " + MenuManager.Instance.bestScore;
+        }
     }
 
     private void Update()
@@ -48,7 +52,6 @@ public class MainManager : MonoBehaviour
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
                 forceDir.Normalize();
-
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
             }
@@ -57,6 +60,13 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                if (m_Points > MenuManager.Instance.bestScore)
+                {
+                    MenuManager.Instance.bestScore = m_Points;
+                    MenuManager.Instance.bestPlayerName = MenuManager.Instance.playerName;
+                    BestScoreAndNameText.text = "Best Score : " + MenuManager.Instance.bestPlayerName + " : " + MenuManager.Instance.bestScore;
+                }
+
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
@@ -72,5 +82,9 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
